@@ -9,12 +9,13 @@
 <body>
 <header>
   <h1>Pré-déclaration impôt sur le revenu</h1>
+  <button class="sec" id="theme_btn" type="button" style="float:right;margin-top:-4px">Thème sombre</button>
   <nav>
-    <button class="on" data-target="foyer">Foyer &amp; revenus</button>
-    <button data-target="frais">Frais &amp; temps</button>
-    <button data-target="loyer">Loyers</button>
+    <button class="on" data-target="f2042">2042 · Revenus et frais</button>
+    <button data-target="f2042c">2042 C · Capitaux</button>
+    <button data-target="k_iom">2042 K IOM · Outre-mer</button>
     <button data-target="synthese">Synthèse</button>
-    <button data-target="params">Paramètres &amp; sauvegarde</button>
+    <button data-target="params">Paramètres &amp; aide</button>
   </nav>
 </header>
 
@@ -24,7 +25,7 @@
   <div class="layout">
     <div class="col">
 
-      <section id="foyer" class="card" data-tab="foyer">
+      <section id="foyer" class="card" data-tab="f2042">
         <h2>Foyer</h2>
         <p class="hint">Situation et enfants : ils déterminent le nombre de parts.</p>
         <div class="grid">
@@ -41,7 +42,36 @@
         </div>
       </section>
 
-      <section id="outremer" class="card" data-tab="foyer">
+      <section id="prelev" class="card" data-tab="f2042">
+        <h2>Prélèvement à la source déjà payé</h2>
+        <p class="hint">Montants figurant sur votre avis ou votre attestation employeur. Ils sont déduits de l'impôt pour calculer le solde.</p>
+        <div class="grid">
+          <label>Retenue à la source sur salaires et pensions (€) <small>case 8HV</small><input type="number" min="0" step="0.01" id="ps_ret"></label>
+          <label>Acomptes d'impôt sur le revenu (€) <small>case 8HW</small><input type="number" min="0" step="0.01" id="ps_ac"></label>
+        </div>
+      </section>
+
+      <section id="capitaux" class="card" data-tab="f2042c">
+        <h2>Revenus de capitaux mobiliers (lignes 2TR, 2TS, 2DC)</h2>
+        <p class="hint">Intérêts, autres revenus distribués, dividendes. Imposés au prélèvement forfaitaire de 12,8 % (l'option pour le barème n'est pas prise en charge ici).</p>
+        <div class="grid">
+          <label>Intérêts et produits à revenu fixe (€) <small>case 2TR</small><input type="number" min="0" step="0.01" id="cap_2tr"></label>
+          <label>Autres revenus distribués (€) <small>case 2TS</small><input type="number" min="0" step="0.01" id="cap_2ts"></label>
+          <label>Dividendes (€) <small>case 2DC</small><input type="number" min="0" step="0.01" id="cap_2dc"></label>
+        </div>
+      </section>
+
+      <section id="pv" class="card" data-tab="f2042c">
+        <h2>Plus-values de cession de valeurs mobilières (lignes 3VG, 3SG)</h2>
+        <p class="hint">Plus-value brute avant abattement pour durée de détention (3VG) et abattement (3SG). Imposée au prélèvement forfaitaire de 12,8 %.</p>
+        <div class="grid">
+          <label>Plus-value avant abattement (€) <small>case 3VG</small><input type="number" min="0" step="0.01" id="pv_3vg"></label>
+          <label>Abattement pour durée de détention (€) <small>case 3SG</small><input type="number" min="0" step="0.01" id="pv_3sg"></label>
+        </div>
+        <div class="note" id="flat_res"></div>
+      </section>
+
+      <section id="outremer" class="card" data-tab="k_iom">
         <h2>Investissement outre-mer</h2>
         <p class="hint">Réduction d'impôt : montant investi × quote-part × taux. Valeurs reprises de votre fichier Excel, à vérifier dans la notice de votre investissement.</p>
         <div class="grid">
@@ -52,7 +82,7 @@
         <div class="note" id="om_res"></div>
       </section>
 
-      <section id="revenus" class="card" data-tab="foyer">
+      <section id="revenus" class="card" data-tab="f2042">
         <h2>Revenus</h2>
         <p class="hint">Salaire net imposable : case 1AJ de l'attestation employeur.</p>
         <div class="grid">
@@ -63,17 +93,31 @@
         </div>
       </section>
 
-      <section id="temps" class="card" data-tab="frais">
-        <h2>Calendrier des jours travaillés</h2>
-        <p class="hint">Cochez les jours travaillés, du lundi au dimanche. Les jours fériés du calendrier français, auxquels s'ajoute le 20 décembre (Abolition de l'esclavage), sont signalés et ne sont pas comptabilisés.</p>
-        <div class="cal-head"><button class="sec" id="cal_prev" type="button">‹</button><b id="cal_title"></b><button class="sec" id="cal_next" type="button">›</button></div>
-        <div class="cal" id="cal_grid"></div>
-        <div class="actions" style="margin-top:12px"><button class="sec" id="cal_all" type="button">Cocher tous les jours ouvrés de l'année</button><button class="sec" id="cal_none" type="button">Tout décocher</button></div>
+      <section id="temps" class="card" data-tab="f2042">
+        <h2>Jours travaillés</h2>
+        <p class="hint">Saisissez vos congés annuels et vos JTL. Les jours ouvrés hors fériés sont calculés par mois, et les jours travaillés = jours ouvrés − CA − JTL.</p>
+        <div class="grid">
+          <label>Congés annuels (CA, en jours)<input type="number" min="0" step="0.5" id="ca"></label>
+          <label>JTL (en jours)<input type="number" min="0" step="0.5" id="jtl"></label>
+        </div>
+        <div class="grid" style="margin-top:12px">
+          <div class="line"><span>Janvier</span><strong id="mo_0">0</strong></div>
+          <div class="line"><span>Février</span><strong id="mo_1">0</strong></div>
+          <div class="line"><span>Mars</span><strong id="mo_2">0</strong></div>
+          <div class="line"><span>Avril</span><strong id="mo_3">0</strong></div>
+          <div class="line"><span>Mai</span><strong id="mo_4">0</strong></div>
+          <div class="line"><span>Juin</span><strong id="mo_5">0</strong></div>
+          <div class="line"><span>Juillet</span><strong id="mo_6">0</strong></div>
+          <div class="line"><span>Août</span><strong id="mo_7">0</strong></div>
+          <div class="line"><span>Septembre</span><strong id="mo_8">0</strong></div>
+          <div class="line"><span>Octobre</span><strong id="mo_9">0</strong></div>
+          <div class="line"><span>Novembre</span><strong id="mo_10">0</strong></div>
+          <div class="line"><span>Décembre</span><strong id="mo_11">0</strong></div>
+        </div>
         <div class="stat">Jours ouvrés hors fériés : <b id="j_ouvres">0</b> · Jours travaillés : <b id="j_travail">0</b></div>
-        <input type="hidden" id="jours_travailles" value="">
       </section>
 
-      <section id="km" class="card" data-tab="frais">
+      <section id="km" class="card" data-tab="f2042">
         <h2>Frais kilométriques</h2>
         <p class="hint">Barème kilométrique selon la puissance fiscale et la distance annuelle.</p>
         <div class="grid">
@@ -86,41 +130,54 @@
         <div class="stat">Km annuels : <b id="km_an">0</b> · Montant : <b id="km_mt">0 €</b></div>
       </section>
 
-      <section id="frais" class="card" data-tab="frais">
+      <section id="frais" class="card" data-tab="f2042">
         <h2>Autres frais professionnels</h2>
         <p class="hint">Choisissez l'abattement de 10 % ou les frais réels. En mode automatique, le plus avantageux est retenu.</p>
         <div class="grid">
           <label>Mode de calcul
             <select id="mode_frais"><option value="auto">Automatique (le plus avantageux)</option><option value="abattement">Abattement 10 %</option><option value="reels">Frais réels</option></select>
           </label>
+          <div id="mode_res" style="grid-column:1/-1;font-size:.88rem;color:var(--muted)"></div>
           <label>Prix payé par repas (€, vide = forfait)<input type="number" min="0" step="0.01" id="repas_prix"><small>Avec justificatifs : le prix réellement payé. Sans justificatif, laissez vide.</small></label>
-          <label>Part financée par l'employeur, par ticket (€)<input type="number" min="0" step="0.01" id="repas_emp"><small>Montant du ticket-restaurant pris en charge par l'employeur</small></label>
-          <label>Jours de télétravail par an<input type="number" id="tele_jours" min="0"><small>Le fichier comptait tous les mercredis et vendredis travaillés</small></label>
+          <fieldset style="grid-column:1/-1;border:1px solid var(--border);border-radius:9px;padding:10px 12px">
+            <legend>Jours habituels de télétravail (cochez)</legend>
+            <div style="display:flex;flex-wrap:wrap;gap:12px">
+            <label class="chk"><input type="checkbox" id="td_1"> Lundi</label>
+            <label class="chk"><input type="checkbox" id="td_2"> Mardi</label>
+            <label class="chk"><input type="checkbox" id="td_3"> Mercredi</label>
+            <label class="chk"><input type="checkbox" id="td_4"> Jeudi</label>
+            <label class="chk"><input type="checkbox" id="td_5"> Vendredi</label>
+            <label class="chk"><input type="checkbox" id="td_6"> Samedi</label>
+            <label class="chk"><input type="checkbox" id="td_0"> Dimanche</label>
+            </div>
+            <div class="stat">Jours de télétravail par an : <b id="tele_n">0</b> <small>(jours cochés hors fériés, proportionnés à vos jours travaillés)</small></div>
+          </fieldset>
           <label>Forfait télétravail (€ par jour)<input type="number" id="tele_taux" min="0" step="0.01"></label>
           <label>Autres frais pro (€)<input type="number" id="autres_pro" min="0" step="0.01"></label>
         </div>
         <div class="note" id="frais_detail"></div>
       </section>
 
-      <section id="mensuel" class="card" data-tab="frais">
+      <section id="mensuel" class="card" data-tab="f2042">
         <h2>Frais mensuels</h2>
         <p class="hint">Pension versée : déductible. Mutuelle obligatoire d'entreprise : sa part salariale est en principe déjà retirée de votre salaire net imposable (vérifiez la case 1AJ de votre attestation), elle n'est donc pas déduite une seconde fois.</p>
         <div class="grid" style="margin-bottom:12px">
-          <label class="chk"><input type="checkbox" id="tr_decl"> Déclarer les titres-restaurant (part payée par vous)</label>
-          <label>Part payée par vous (%)<input type="number" min="0" max="100" step="1" id="tr_part"></label>
-          
-          
+          <label>Valeur faciale d'un ticket (€)<input type="number" min="0" step="0.01" id="tr_val"></label>
+          <label>Part employeur (%)<input type="number" min="0" max="100" step="1" id="tr_emp"></label>
+          <label>Part salarié (%)<input type="number" id="tr_sal" readonly></label>
+          <label class="chk"><input type="checkbox" id="tr_decl"> Déclarer la part salarié des titres-restaurant</label>
         </div>
+        <p class="hint">Un ticket par jour travaillé. La part employeur réduit les frais de repas ; la part salarié est déduite si vous la déclarez.</p>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>Mois</th><th>Mutuelle</th><th>Titres-resto</th><th>Syndicat</th><th>Pension versée</th></tr></thead>
+            <thead><tr><th>Mois</th><th>Mutuelle</th><th>Syndicat</th><th>Pension versée</th></tr></thead>
             <tbody id="mois_body"></tbody>
-            <tfoot><tr><th>Total</th><td id="t_mut"></td><td id="t_tr"></td><td id="t_syn"></td><td id="t_pen"></td></tr></tfoot>
+            <tfoot><tr><th>Total</th><td id="t_mut"></td><td id="t_syn"></td><td id="t_pen"></td></tr></tfoot>
           </table>
         </div>
       </section>
 
-      <section id="loyer" class="card" data-tab="loyer">
+      <section id="loyer" class="card" data-tab="f2042">
         <h2>Loyers perçus</h2>
         <p class="hint">Revenus fonciers. Au-delà de 15 000 € de loyers par an, le régime réel s'impose.</p>
         <div class="tablewrap">
@@ -176,6 +233,14 @@
         <div class="actions" style="margin-top:12px"><button class="sec" id="btn_params">Rétablir les valeurs de départ</button></div>
       </section>
 
+      <section class="card" data-tab="params" id="aide">
+        <h2>Aide</h2>
+        <p class="hint">Ce site aide à préparer votre déclaration. Il ne remplace pas le formulaire officiel ni un conseiller fiscal.</p>
+        <div class="note"><b>Mode d'emploi</b><br>1. Foyer et revenus : situation, enfants, salaires, pensions.<br>2. Frais et temps : jours travaillés, kilomètres, repas, télétravail, tickets-restaurant, frais mensuels.<br>3. Loyers : revenus fonciers, si vous louez.<br>4. Synthèse : impôt estimé et solde.<br>5. Sauvegarder ou exporter vos saisies avant de fermer la page.</div>
+        <div class="note"><b>Vos données restent sur votre appareil.</b> Aucune saisie n'est envoyée à un serveur. Effacer les données du navigateur les supprime.</div>
+        <div class="note"><b>Les barèmes</b> (kilométrique, impôt, abattement, forfaits) sont dans « Paramètres fiscaux ». Mettez-les à jour chaque année d'après impots.gouv.fr.</div>
+      </section>
+
       <section class="card no-print" data-tab="params">
         <h2>Sauvegarde</h2>
         <p class="hint">Sauvegarde locale sur cet appareil, export JSON, impression.</p>
@@ -209,6 +274,8 @@
       <div class="line"><span>Impôt si titres-restaurant déclarés</span><strong id="s_tr_avec">0 €</strong></div>
       <div class="line"><span>Impôt si titres-restaurant non déclarés</span><strong id="s_tr_sans">0 €</strong></div>
       <div class="line"><span>Plus avantageux</span><strong id="s_tr_best">—</strong></div>
+      <div class="line"><span>Déjà prélevé (salaires et acomptes)</span><strong id="s_paye">0 €</strong></div>
+      <div class="line"><span>Solde</span><strong id="s_solde">0 €</strong></div>
       <div class="line"><span>Taux moyen</span><strong id="s_taux">0 %</strong></div>
       <div class="line"><span>Tranche marginale</span><strong id="s_marg">0 %</strong></div>
       <div id="alerts"></div>

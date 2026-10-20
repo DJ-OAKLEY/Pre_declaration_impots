@@ -1,5 +1,4 @@
   :root{--bg:#f3f5fa;--surface:#fff;--text:#1c2433;--muted:#5b6578;--primary:#2b5bd7;--soft:#e7eefc;--ok:#1f8a4c;--warn:#b56a12;--border:#dfe5f0;--radius:14px;--shadow:0 2px 12px rgba(20,30,60,.06);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151e;--surface:#1a2130;--text:#e7ecf6;--muted:#97a2b8;--primary:#6f92f2;--soft:#222c44;--ok:#4cc27c;--warn:#e3a54c;--border:#2b3548;--shadow:none;color-scheme:dark}}
   :root[data-theme="dark"]{--bg:#11151e;--surface:#1a2130;--text:#e7ecf6;--muted:#97a2b8;--primary:#6f92f2;--soft:#222c44;--ok:#4cc27c;--warn:#e3a54c;--border:#2b3548;--shadow:none;color-scheme:dark}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;scroll-padding-top:96px}
@@ -48,12 +47,5 @@
   .layout.solo .summary{position:static}
   nav button{white-space:nowrap;font:inherit;font-size:.9rem;color:var(--primary);background:var(--soft);border:1px solid transparent;padding:8px 14px;border-radius:999px;min-height:40px;cursor:pointer}
   nav button.on{background:var(--primary);color:#fff}
-  .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .cal .dow{font-size:.75rem;color:var(--muted);text-align:center}
-  .cal button{min-height:42px;padding:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:8px;font-size:.9rem;cursor:pointer}
-  .cal button.on{background:var(--primary);color:#fff;border-color:var(--primary)}
-  .cal button.hol{background:var(--soft);color:var(--warn);cursor:default}
-  .cal button.we{opacity:.35;cursor:default}
   [hidden]{display:none!important}
   @media print{header nav,.no-print,.actions{display:none!important}body{background:#fff;color:#000}.card{box-shadow:none;break-inside:avoid}}
