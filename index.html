@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pré-déclaration impôt sur le revenu</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Pré-déclaration impôt sur le revenu</h1>
+  <nav>
+    <button class="on" data-target="foyer">Foyer &amp; revenus</button>
+    <button data-target="frais">Frais &amp; temps</button>
+    <button data-target="loyer">Loyers</button>
+    <button data-target="synthese">Synthèse</button>
+    <button data-target="params">Paramètres &amp; sauvegarde</button>
+  </nav>
+</header>
+
+<main>
+  <p class="disc">Outil d'aide à la préparation. Barème, plafonds et forfaits sont à vérifier sur impots.gouv.fr. Les saisies restent sur cet appareil.</p>
+
+  <div class="layout">
+    <div class="col">
+
+      <section id="foyer" class="card" data-tab="foyer">
+        <h2>Foyer</h2>
+        <p class="hint">Situation et enfants : ils déterminent le nombre de parts.</p>
+        <div class="grid">
+          <label>Année des revenus<input type="number" id="annee" min="2000" max="2100"></label>
+          <label>Situation
+            <select id="situation"><option value="celibataire">Célibataire, divorcé, veuf</option><option value="marie">Marié ou pacsé</option></select>
+          </label>
+          <label>Enfants à charge<input type="number" id="nb_enfants" min="0"></label>
+          <label>Dont enfants de moins de 6 ans<input type="number" id="nb_moins6" min="0"></label>
+          <label>Frais de garde hors domicile (€/an)<input type="number" id="frais_garde" min="0" step="0.01"><small>Crèche, assistante maternelle, centre de loisirs</small></label>
+          <label class="chk"><input type="checkbox" id="parent_isole"> Parent isolé</label>
+          <label>Collégiens scolarisés<input type="number" id="nb_college" min="0"><small>Réduction forfaitaire de 61 € par enfant (à vérifier)</small></label>
+          <label>Lycéens scolarisés<input type="number" id="nb_lycee" min="0"><small>Réduction forfaitaire de 153 € par enfant (à vérifier)</small></label>
+        </div>
+      </section>
+
+      <section id="outremer" class="card" data-tab="foyer">
+        <h2>Investissement outre-mer</h2>
+        <p class="hint">Réduction d'impôt : montant investi × quote-part × taux. Valeurs reprises de votre fichier Excel, à vérifier dans la notice de votre investissement.</p>
+        <div class="grid">
+          <label>Montant investi (€)<input type="number" id="om_montant" min="0" step="0.01"></label>
+          <label>Quote-part (%)<input type="number" id="om_quote" min="0" max="100" step="0.01"></label>
+          <label>Taux de réduction (%)<input type="number" id="om_taux" min="0" max="100" step="0.01"></label>
+        </div>
+        <div class="note" id="om_res"></div>
+      </section>
+
+      <section id="revenus" class="card" data-tab="foyer">
+        <h2>Revenus</h2>
+        <p class="hint">Salaire net imposable : case 1AJ de l'attestation employeur.</p>
+        <div class="grid">
+          <label>Salaires nets imposables (€)<input type="number" id="salaire" min="0" step="0.01"></label>
+          <label>Pensions de retraite reçues (€)<input type="number" id="pension_recue" min="0" step="0.01"></label>
+          <label>Allocations chômage (€)<input type="number" id="chomage" min="0" step="0.01"></label>
+          <label>Autres revenus imposables (€)<input type="number" id="autres_revenus" min="0" step="0.01"></label>
+        </div>
+      </section>
+
+      <section id="temps" class="card" data-tab="frais">
+        <h2>Calendrier des jours travaillés</h2>
+        <p class="hint">Cochez les jours travaillés, du lundi au dimanche. Les jours fériés du calendrier français, auxquels s'ajoute le 20 décembre (Abolition de l'esclavage), sont signalés et ne sont pas comptabilisés.</p>
+        <div class="cal-head"><button class="sec" id="cal_prev" type="button">‹</button><b id="cal_title"></b><button class="sec" id="cal_next" type="button">›</button></div>
+        <div class="cal" id="cal_grid"></div>
+        <div class="actions" style="margin-top:12px"><button class="sec" id="cal_all" type="button">Cocher tous les jours ouvrés de l'année</button><button class="sec" id="cal_none" type="button">Tout décocher</button></div>
+        <div class="stat">Jours ouvrés hors fériés : <b id="j_ouvres">0</b> · Jours travaillés : <b id="j_travail">0</b></div>
+        <input type="hidden" id="jours_travailles" value="">
+      </section>
+
+      <section id="km" class="card" data-tab="frais">
+        <h2>Frais kilométriques</h2>
+        <p class="hint">Barème kilométrique selon la puissance fiscale et la distance annuelle.</p>
+        <div class="grid">
+          <label>Puissance fiscale
+            <select id="cv"><option value="3">3 CV et moins</option><option value="4">4 CV</option><option value="5">5 CV</option><option value="6">6 CV</option><option value="7">7 CV et plus</option></select>
+          </label>
+          <label>Distance par trajet (km)<input type="number" id="dist" min="0" step="0.1"></label>
+          <label>Trajets par jour travaillé<input type="number" id="trajets" min="0" step="1"><small>2 = aller-retour</small></label>
+        </div>
+        <div class="stat">Km annuels : <b id="km_an">0</b> · Montant : <b id="km_mt">0 €</b></div>
+      </section>
+
+      <section id="frais" class="card" data-tab="frais">
+        <h2>Autres frais professionnels</h2>
+        <p class="hint">Choisissez l'abattement de 10 % ou les frais réels. En mode automatique, le plus avantageux est retenu.</p>
+        <div class="grid">
+          <label>Mode de calcul
+            <select id="mode_frais"><option value="auto">Automatique (le plus avantageux)</option><option value="abattement">Abattement 10 %</option><option value="reels">Frais réels</option></select>
+          </label>
+          <label>Prix payé par repas (€, vide = forfait)<input type="number" min="0" step="0.01" id="repas_prix"><small>Avec justificatifs : le prix réellement payé. Sans justificatif, laissez vide.</small></label>
+          <label>Part financée par l'employeur, par ticket (€)<input type="number" min="0" step="0.01" id="repas_emp"><small>Montant du ticket-restaurant pris en charge par l'employeur</small></label>
+          <label>Jours de télétravail par an<input type="number" id="tele_jours" min="0"><small>Le fichier comptait tous les mercredis et vendredis travaillés</small></label>
+          <label>Forfait télétravail (€ par jour)<input type="number" id="tele_taux" min="0" step="0.01"></label>
+          <label>Autres frais pro (€)<input type="number" id="autres_pro" min="0" step="0.01"></label>
+        </div>
+        <div class="note" id="frais_detail"></div>
+      </section>
+
+      <section id="mensuel" class="card" data-tab="frais">
+        <h2>Frais mensuels</h2>
+        <p class="hint">Pension versée : déductible. Mutuelle obligatoire d'entreprise : sa part salariale est en principe déjà retirée de votre salaire net imposable (vérifiez la case 1AJ de votre attestation), elle n'est donc pas déduite une seconde fois.</p>
+        <div class="grid" style="margin-bottom:12px">
+          <label class="chk"><input type="checkbox" id="tr_decl"> Déclarer les titres-restaurant (part payée par vous)</label>
+          <label>Part payée par vous (%)<input type="number" min="0" max="100" step="1" id="tr_part"></label>
+          
+          
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Mois</th><th>Mutuelle</th><th>Titres-resto</th><th>Syndicat</th><th>Pension versée</th></tr></thead>
+            <tbody id="mois_body"></tbody>
+            <tfoot><tr><th>Total</th><td id="t_mut"></td><td id="t_tr"></td><td id="t_syn"></td><td id="t_pen"></td></tr></tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section id="loyer" class="card" data-tab="loyer">
+        <h2>Loyers perçus</h2>
+        <p class="hint">Revenus fonciers. Au-delà de 15 000 € de loyers par an, le régime réel s'impose.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Logement</th><th>Loyer mensuel</th><th>Mois loués</th><th>Charges annuelles</th></tr></thead>
+            <tbody id="loyer_body"></tbody>
+          </table>
+        </div>
+        <div class="grid">
+          <label>Régime
+            <select id="regime"><option value="reel">Réel (taxes, assurances, travaux…)</option><option value="micro">Micro-foncier (abattement 30 %)</option></select>
+          </label>
+        </div>
+        <div class="note" id="loyer_res"></div>
+        <div id="loyer_alert"></div>
+      </section>
+
+      <section id="params" class="card" data-tab="params">
+        <h2>Paramètres fiscaux</h2>
+        <p class="hint">Barèmes, abattements et forfaits. Modifiez-les quand le barème officiel change : les valeurs sont enregistrées automatiquement sur cet appareil.</p>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Puissance</th><th>Coef. ≤ 5 000 km</th><th>Coef. 5 001–20 000</th><th>Fixe 5 001–20 000</th><th>Coef. &gt; 20 000</th></tr></thead>
+          <tbody>
+            <tr><th>3 CV et moins</th><td><input type="number" step="0.001" id="p_km_3_a"></td><td><input type="number" step="0.001" id="p_km_3_b"></td><td><input type="number" step="1" id="p_km_3_c"></td><td><input type="number" step="0.001" id="p_km_3_d"></td></tr>
+            <tr><th>4 CV</th><td><input type="number" step="0.001" id="p_km_4_a"></td><td><input type="number" step="0.001" id="p_km_4_b"></td><td><input type="number" step="1" id="p_km_4_c"></td><td><input type="number" step="0.001" id="p_km_4_d"></td></tr>
+            <tr><th>5 CV</th><td><input type="number" step="0.001" id="p_km_5_a"></td><td><input type="number" step="0.001" id="p_km_5_b"></td><td><input type="number" step="1" id="p_km_5_c"></td><td><input type="number" step="0.001" id="p_km_5_d"></td></tr>
+            <tr><th>6 CV</th><td><input type="number" step="0.001" id="p_km_6_a"></td><td><input type="number" step="0.001" id="p_km_6_b"></td><td><input type="number" step="1" id="p_km_6_c"></td><td><input type="number" step="0.001" id="p_km_6_d"></td></tr>
+            <tr><th>7 CV et plus</th><td><input type="number" step="0.001" id="p_km_7_a"></td><td><input type="number" step="0.001" id="p_km_7_b"></td><td><input type="number" step="1" id="p_km_7_c"></td><td><input type="number" step="0.001" id="p_km_7_d"></td></tr>
+          </tbody>
+        </table></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Tranche de revenu par part</th><th>Seuil (€)</th><th>Taux</th></tr></thead>
+          <tbody>
+            <tr><th>Tranche 1</th><td><input type="number" step="1" id="p_seuil_0"></td><td><input type="number" step="0.01" id="p_taux_0"></td></tr>
+            <tr><th>Tranche 2</th><td><input type="number" step="1" id="p_seuil_1"></td><td><input type="number" step="0.01" id="p_taux_1"></td></tr>
+            <tr><th>Tranche 3</th><td><input type="number" step="1" id="p_seuil_2"></td><td><input type="number" step="0.01" id="p_taux_2"></td></tr>
+            <tr><th>Tranche 4</th><td><input type="number" step="1" id="p_seuil_3"></td><td><input type="number" step="0.01" id="p_taux_3"></td></tr>
+            <tr><th>Tranche 5</th><td><input type="number" step="1" id="p_seuil_4"></td><td><input type="number" step="0.01" id="p_taux_4"></td></tr>
+          </tbody>
+        </table></div>
+        <div class="grid">
+          <label>Abattement forfaitaire sur salaires (taux)<input type="number" step="0.01" id="p_abat_taux"></label>
+          <label>Abattement minimum (€)<input type="number" step="1" id="p_abat_min"></label>
+          <label>Abattement maximum (€)<input type="number" step="1" id="p_abat_max"></label>
+          <label>Valeur d'un repas au foyer (€)<input type="number" step="0.01" id="p_repas_foyer"><small>Valeur administrative annuelle (5,45 € pour les revenus 2025)</small></label>
+          <label>Seuil du micro-foncier (€ de loyers)<input type="number" step="1" id="p_micro"></label>
+          <label>Réduction scolarité collège (€ par enfant)<input type="number" step="1" id="p_col"></label>
+          <label>Réduction scolarité lycée (€ par enfant)<input type="number" step="1" id="p_lyc"></label>
+          <label>Plafond de garde par enfant de moins de 6 ans (€)<input type="number" step="1" id="p_plaf_garde"></label>
+          <label>Taux du crédit d'impôt garde<input type="number" step="0.01" id="p_taux_garde"></label>
+        </div>
+        <div class="tablewrap"><table><thead><tr><th>Jours fériés (année choisie)</th><th>Date</th></tr></thead><tbody id="feries_body"></tbody></table></div>
+        <div class="actions" style="margin-top:12px"><button class="sec" id="btn_params">Rétablir les valeurs de départ</button></div>
+      </section>
+
+      <section class="card no-print" data-tab="params">
+        <h2>Sauvegarde</h2>
+        <p class="hint">Sauvegarde locale sur cet appareil, export JSON, impression.</p>
+        <div class="actions">
+          <button id="btn_save">Sauvegarder</button>
+          <button class="sec" id="btn_export">Exporter (JSON)</button>
+          <button class="sec" id="btn_print">Imprimer</button>
+          <button class="danger" id="btn_reset">Réinitialiser</button>
+        </div>
+        <div class="saved" id="saved_msg"></div>
+      </section>
+    </div>
+
+    <aside class="card summary" data-tab="synthese" aria-live="polite">
+      <h2>Synthèse estimée</h2>
+      <p class="hint">Estimation brute : hors décote, autres réductions et prélèvements sociaux.</p>
+      <div class="line"><span>Salaires + pensions + revenus</span><strong id="s_brut">0 €</strong></div>
+      <div class="line"><span>Frais retenus</span><strong id="s_ded">0 €</strong></div>
+      <div class="line"><span>Mode retenu</span><strong id="s_choix">—</strong></div>
+      <div class="line"><span>Revenus fonciers nets</span><strong id="s_fon">0 €</strong></div>
+      <div class="line"><span>Déductions diverses</span><strong id="s_div">0 €</strong></div>
+      <div class="line"><span>Revenu net imposable</span><strong id="s_net">0 €</strong></div>
+      <div class="line"><span>Parts fiscales</span><strong id="s_parts">1</strong></div>
+      <div class="line"><span>Quotient familial</span><strong id="s_qf">0 €</strong></div>
+      <div style="margin-top:12px">Impôt brut estimé</div>
+      <div class="big" id="s_impot">0 €</div>
+      <div class="line"><span>Crédit garde d'enfants</span><strong id="s_garde">0 €</strong></div>
+      <div class="line"><span>Réduction scolarité</span><strong id="s_scol">0 €</strong></div>
+      <div class="line"><span>Réduction outre-mer</span><strong id="s_om">0 €</strong></div>
+      <div class="line"><span>Impôt estimé</span><strong id="s_final">0 €</strong></div>
+      <div class="line"><span>Impôt si titres-restaurant déclarés</span><strong id="s_tr_avec">0 €</strong></div>
+      <div class="line"><span>Impôt si titres-restaurant non déclarés</span><strong id="s_tr_sans">0 €</strong></div>
+      <div class="line"><span>Plus avantageux</span><strong id="s_tr_best">—</strong></div>
+      <div class="line"><span>Taux moyen</span><strong id="s_taux">0 %</strong></div>
+      <div class="line"><span>Tranche marginale</span><strong id="s_marg">0 %</strong></div>
+      <div id="alerts"></div>
+    </aside>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
